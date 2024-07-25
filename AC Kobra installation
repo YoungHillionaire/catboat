@@ -1,0 +1,66 @@
+***KLIPPER - Anycubic Kobra Standard: An Extensive Tutorial***
+Hello All! I hope you're doing well!
+After almost three days of back and forth, I have finally been able to install Klipper on my Kobra Standard. So, I felt compelled to write a detailed "how to".
+First things firs: As it's well known, an auxiliar device is needed in order to run Klipper.
+In my case, I am simply using a virtual machine running Linux Mint 21.2, but chances are you can run on any other distribution with minor adjustments.
+Also, I should mention that I'm using Oracle's VM VirtualBox, instead of Window's Hyper-V.
+I don't know the exact reason, but I was able installing everything correctly on Hyper-V, but as soon as I tried connecting from another PC, it would simply freeze and the only way to have the machine working again was to reboot it - VirtualBox did not have this issue.
+All the steps from here on assume you already have a running linux system.
+Depending on the Linux Distribution you're using, you will need to set the user you've created to the "sudoers" group, in order to be able running KIAUH (you can't run it as the root user).
+A) On your terminal, type "su". You will be requested to input the root password (so you need to write this down/save it somewhere because you'll need it).
+B) Once you change to the root user, you will need to input the following code:
+usermod -aG sudo username
+Where "username" is the name you've chosen for you when installing linux
+After that you need to reboot your system to make sure the permissions are granted.
+For that run:
+sudo reboot
+Now you need to install Klipper/Moonraker + Your Preferred Frontend (for me, Mainsail). For that, we will use KIAUH, which makes things really easy.
+Run the following commands:
+sudo apt-get update && sudo apt-get install git -y
+and
+cd ~ && git clone https://github.com/dw-0/kiauh.git
+Finally, start KIAYH by running:
+./kiauh/kiauh.sh
+Follow the menu options to install Klipper, Moonraker and Frontend (Mainsail/Fluidd), in this order.
+Once everything is installed, you can test if you can exit the KIAUH menu and try to reach the server by just typing the machine IP.
+If you don't know the IP, type this command on the terminal:
+hostname -I
+If you're able reaching it successfully, it means you can proceed.
+If not, consider that the Linux machine is connected to the same network as the computer you're using to access.
+Also consider that the computer you're installing klipper has a half decent configuration - I have tried running this setup on an ancient Atom D140 + 3gb Ram and unfortunately it did not work, so take that into account.
+We will need to clone the Catboat repository, because this is what we will use to Klipperize our Kobra.
+To do that run these commands:
+cd ~/kiauh
+echo "https://github.com/Klipper3d/klipper,master" > klipper_repos.txt
+echo "https://github.com/printers-for-people/catboat,main" >> klipper_repos.txt
+Now, we will use KIAUH again, this time to uninstall Klipper (I know, it sounds counter intuitive but that's how it is!).
+Once again, follow the menus and uninstall it. Once uninstalled, go to the settings menu, then select "Set Custom Klipper Repository".
+If everything was correct on step 6, you should see the option "printers-for-people/catboat → main".
+Go back to the main menu, this time select "Install", and once again, install Klipper - This time, the Catboat repository will be used instead.
+Now we need to compile the firmware.
+Go back to the main menu and select the "Advanced" option.
+Inside this menu, select "Build Only".
+On "Micro Controller" select "Huada Semiconductor HC32F460".
+On "Communication interface" select "Serial (PA3 & PA2)"
+and on " Clock Speed" select "200 MHz".
+If you're not comfortable enough doing this step, I'm leaving my firmware.bin for download - HOWEVER, I am not responsible if something bad happens. My printer is working just fine, but catastrophes may happen.
+This will build the file to the folder /klipper/out/klipper.bin.
+Rename this file to "firmware.bin" and then copy it to a FAT32 formatted SD card.
+Insert the SD card on the Kobra with it turned off.
+After turning it on, it will beep 5 times. There is no consensus here, but wait around 5 minutes, turn off the printer, remove the memory card and then turn it on.
+Don't Panick! The Display now is "useless" (Unless you're keen to see the Anycubic logo forever lol).
+Connect your printer to the PC/Pi or whatever you've installed klipper.
+On your frontend, you will need to edit the printer.cfg file.
+Copy the contents of this file:
+https://github.com/.../printer-anycubic-kobra-2022.cfg...
+Click on "Save &Restart".
+If everything went fine, congratulations! You have now a fully functional Kobra with klipper!
+If you have followed all the steps but still had no success, let's try to troubleshoot.
+A) Go to the KIAUH menu again. Go to Advanced, but this time select "Get MCU ID".
+Select the "USB" option.
+If you see "No MCU detected" (or something along those lines), your printer is still not being seen by the computer.
+In MY case, this problem was caused by the library "brltty".
+This comes installed with many linux distributions as far as I know.
+If you don't need it, remove it using
+sudo apt remove brltty
+Run the steps from step 15 - A. If it detects your printer, then it means that your frontend will probably be able detecting it too!
